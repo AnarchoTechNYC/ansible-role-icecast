@@ -1,0 +1,170 @@
+# Icecast2 is configured almost exclusively through a config file.
+# This file mirrors the default values of the upstream distribution
+# and serve as an example for how to configure the role.
+# See: https://icecast.org/docs/icecast-2.4.1/config-file.html
+---
+
+# Set server defaults here.
+icecast_enabled: true  # If `false`, Icecast will refuse to start.
+
+# Icecast server hostname used in links that clients download.
+# You'll likely want this changed. :)
+icecast_hostname: localhost
+
+# Each of the server's listening sockets must have at least a port.
+# Additional options can be omitted. Defaults are shown.
+icecast_listen_sockets:
+    - port: 8000
+      #bind_address: 127.0.0.1
+      #ssl: false
+      #shoutcast_mount: /stream
+
+# Main `<authentication>` configuration options.
+icecast_admin_username: admin
+icecast_admin_password: ''  # User must set this.
+icecast_relay_password: ''  # User must set this.
+icecast_source_password: '' # User must set this.
+
+# Main stream/server metadata settings.
+icecast_default_stream: /stream
+icecast_shoutcast_mount: "{{ icecast_default_stream }}"
+icecast_location: Earth
+icecast_admin_email: icemaster@localhost
+icecast_fileserve: true
+
+# These variables are used as values for the Icecast `<paths>` config
+# element. (They are not installation paths.)
+icecast_paths_basedir: /usr/share/icecast2
+icecast_paths_logdir: /var/log/icecast2
+icecast_paths_webroot: /usr/share/icecast2/web
+icecast_paths_adminroot: /usr/share/icecast2/admin
+#icecast_paths_pidfile: /usr/share/icecast2/icecast.pid
+#icecast_paths_tls_certificate: /usr/share/icecast2/icecast.pem
+#icecast_paths_ssl_certificate: "{{ icecast_paths_tls_certificate }}"
+icecast_paths_aliases:
+    - source: /
+      destination: /status.xsl
+      # Limit an alias to a specific listen socket with these two
+      # additional attributes.
+      #port: 8000
+      #bind_address: 127.0.0.1
+
+# Maps to the `<limits>` element in the Icecast XML configuration.
+icecast_limits_clients: 100
+icecast_limits_sources: 2
+icecast_limits_queue_size: 524288
+icecast_limits_client_timeout: 30
+icecast_limits_header_timeout: 15
+icecast_limits_source_timeout: 10
+icecast_limits_burst_size: 65535
+
+icecast_http_headers:
+    - name: Access-Control-Allow-Origin
+      value: "*"
+      # Add header only in responses with given HTTP Status code.
+      #status: 404
+
+icecast_logging_accesslog: access.log
+icecast_logging_errorlog: error.log
+#icecast_logging_playlistlog: playlist.log
+icecast_logging_loglevel: 3
+icecast_logging_logsize: 10000
+#icecast_logging_logarchive: true
+
+icecast_security_chroot: false
+#icecast_security_changeowner_user: nobody
+#icecast_security_changeowner_group: nogroup
+
+# By default, Icecast's YP (Yellow Pages) directroy listings are not
+# enabled. In your role, provide the `icecast_directory` variable with
+# settings similar to the following to enable them.
+#icecast_directory_yp_url: http://dir.xiph.org/cgi-bin/yp-cgi
+#icecast_directory_yp_url_timeout: 15
+#
+# Relay configuration.
+# Leave these commented out if you have only one Icecast server.
+#
+# To relay all public mountpoints (i.e., streams that aren't hidden)
+# from an existing Icecast server, use what the official docs call a
+# so-called "master relay" configuration. We use the clearer name "mirror relay" because your relay will be a mirror of an upstream server's contents.
+#icecast_mirror_server_addr: 127.0.0.1
+#icecast_mirror_server_port: 8001
+#icecast_mirror_server_update_interval: 120
+#icecast_mirror_server_username: relay
+#icecast_mirror_server_password: ChangeMe
+#icecast_mirror_server_relays_on_demand: true
+
+# Relay specific streams (called "mountpoints" in Icecast lingo).
+#icecast_relays:
+#    - addr: 127.0.0.1
+#      port: 8001
+#      mount: /stream
+#      local_mount: /different.ogg
+#      username: joe
+#      password: soap
+#      shoutcast_metadata: false
+#      on_demand: "{{ icecast_mirror_server_relays_on_demand }}"
+
+# Mount configuration translates to `<mount>` elements in the Icecast
+# configuration file. You only need to define these if you want to use
+# advanced options, like alternative usernames or passwords. This
+# setup mimics the comments in the upstream Icecast XML config.
+#icecast_mountpoints:
+#    - type: default
+#      public: false
+#      intro: /server-wide-intro.ogg
+#      max_listener_duration: 3600
+#      authentication:
+#          type: url
+#          options:
+#              name: mount_add
+#              value: http://auth.example.org/stream_start.php
+#      http_headers:
+#          - name: foo
+#            value: bar
+#
+#    - type: normal
+#      name: /example-complex.ogg
+#      username: othersource
+#      password: examplepass
+#      max_listeners: 1
+#      dump_file: /tmp/dump-example1.ogg
+#      burst_size: 65536
+#      fallback_mount: /example2.ogg
+#      fallback_when_full: true
+#      intro: /example_intro.ogg
+#      hidden: true
+#      public: true
+#      mimetype: audio/ogg # Maps to the Icecast `<type>` element.
+#      authentication:
+#          type: htpasswd
+#          options:
+#              - name: filename
+#                value: myauth
+#              - name: allow_duplicate_users
+#                value: false
+#      http_headers:
+#          - name: Access-Control-Allow-Origin
+#            value: http://webplayer.example.org
+#          - name: baz
+#            value: quux
+#      on_connect: /home/icecast/bin/stream-start
+#      on_disconnect: /home/icecast/bin/stream-stop
+#
+#    - type: normal
+#      mount_name: /auth_example.ogg
+#      authentication:
+#          type: url
+#          options:
+#              - name: mount_add
+#                value: http://myauthserver.net/notify_mount.php
+#              - name: mount_remove
+#                value: http://myauthserver.net/notify_mount.php
+#              - name: listener_add
+#                value: http://myauthserver.net/notify_listener.php
+#              - name: listener_remove
+#                value: http://myauthserver.net/notify_listener.php
+#              - name: headers
+#                value: x-pragma,x-token
+#              - name: header_prefix
+#                value: "ClientHeader."

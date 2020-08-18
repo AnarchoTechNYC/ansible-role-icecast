@@ -1,0 +1,304 @@
+{#-
+    Template for Icecast 2 server.
+-#}
+<!-- {{ ansible_managed }} -->
+<!--
+For detailed setup instructions please refer to the documentation.
+See: https://icecast.org/docs/icecast-2.4.1/config-file.html
+-->
+<icecast>
+    <location>{{ icecast_location }}</location>
+    <admin>{{ icecast_admin_email }}</admin>
+
+    <limits>
+        <clients>{{ icecast_limits_clients | int }}</clients>
+        <sources>{{ icecast_limits_sources | int }}</sources>
+        <queue-size>{{ icecast_limits_queue_size | int }}</queue-size>
+        <client-timeout>{{ icecast_limits_client_timeout | int }}</client-timeout>
+        <header-timeout>{{ icecast_limits_header_timeout | int }}</header-timeout>
+        <source-timeout>{{ icecast_limits_source_timeout | int }}</source-timeout>
+        <burst-size>{{ icecast_limits_burst_size | int }}</burst-size>
+    </limits>
+
+    <authentication>
+        <!-- Sources log in with username 'source' -->
+        <source-password>{{ icecast_source_password }}</source-password>
+        <!-- Relays log in with username 'relay' -->
+        <relay-password>{{ icecast_relay_password }}</relay-password>
+        <admin-user>{{ icecast_admin_username }}</admin-user>
+        <admin-password>{{ icecast_admin_password }}</admin-password>
+    </authentication>
+
+    <shoutcast-mount>{{ icecast_shoutcast_mount }}</shoutcast-mount>
+
+    {% if
+        icecast_directory_yp_url is defined
+        or
+        icecast_directory_yp_url_timeout is defined
+    %}
+    <directory>
+        <yp-url-timeout>{{ icecast_directory_yp_url_timeout | int }}</yp-url-timeout>
+        <yp-url>{{ icecast_directory_yp_url }}</yp-url>
+    </directory>
+    {% endif %}
+
+    <hostname>{{ icecast_hostname }}</hostname>
+
+    {% if icecast_listen_sockets is defined %}
+    <listen-socket>
+        {% for socket in icecast_listen_sockets %}
+        <port>{{ socket.port | int }}</port>
+        {% if socket.bind_address is defined %}
+        <bind-address>{{ socket.bind_address | ipaddr }}</bind-address>
+        {% endif %}
+        {% if socket.ssl is defined %}
+        <ssl>{{ socket.ssl | int }}</ssl>
+        {% endif %}
+        {% if socket.shoutcast_mount is defined %}
+        <shoutcast-mount>{{ socket.shoutcast-mount }}</shoutcast-mount>
+        {% endif %}
+        {% endfor %}
+    </listen-socket>
+    {% endif %}
+
+    {% if icecast_http_headers is defined %}
+    <http-headers>
+        {% for header in icecast_http_headers%}
+        <header
+            name="{{ header.name }}"
+            value="{{ header.value }}"
+            {% if header.status is defined %}status="{{ header.status }}"{% endif %}
+        />
+        {% endfor %}
+    </http-headers>
+    {% endif %}
+
+    {#
+        Icecast uses the term "master server" but this is not very
+        clear. We use the term "mirror server" because the purpose
+        of a so-called "master" is to be mirrored by the server we
+        are configuring here. This is used for relaying all public
+        mountpoints of the upstream Icecast server down to our own.
+    #}
+    {% if icecast_mirror_server_addr is defined %}
+    <master-server>{{ icecast_mirror_server_addr | ipaddr }}</master-server>
+    {% endif %}
+    {% if icecast_mirror_server_port is defined %}
+    <master-server-port>{{ icecast_mirror_server_port | int }}</master-server-port>
+    {% endif %}
+    {% if icecast_mirror_server_update_interval is defined %}
+    <master-update-interval>{{ icecast_mirror_server_update_interval | int }}</master-update-interval>
+    {% endif %}
+    {% if icecast_mirror_server_username is defined %}
+    <master-username>{{ icecast_mirror_server_username }}</master-username>
+    {% endif %}
+    {% if icecast_mirror_server_password is defined %}
+    <master-password>{{ icecast_mirror_server_password }}</master-password>
+    {% endif %}
+    {% if icecast_mirror_server_relays_on_demand is defined %}
+    <relays-on-demand>{{ icecast_mirror_server_relays_on_demand | int }}</relays-on-demand>
+    {% endif %}
+
+    {% if icecast_relays is defined %}
+    {% for relay in icecast_relays %}
+    <relay>
+        <server>{{ relay.addr | ipaddr }}</server>
+        <port>{{ relay.port | int }}</port>
+        <mount>{{ relay.mount }}</mount>
+        {% if relay.local_mount is defined %}
+        {% endif %}
+        <local-mount>{{ relay.local_mount }}</local-mount>
+        {% if relay.username is defined %}
+        <username>{{ relay.username }}</username>
+        {% endif %}
+        {% if relay.password is defined %}
+        <password>{{ relay.password }}</password>
+        {% endif %}
+        <on-demand>0</on-demand>
+        {% if relay.shoutcast_metadata is defined %}
+        <relay-shoutcast-metadata>{{ relay.shoutcast_metadata | int }}</relay-shoutcast-metadata>
+        {% endif %}
+    </relay>
+    {% endfor %}
+    {% endif %}
+
+    {% if icecast_mountpoints is defined %}
+    {% for mount in icecast_mountpoints %}
+    <mount type="{{ mount.type | default('normal') }}">
+        {% if mount.name is defined %}
+        <mount-name>{{ mount.name }}</mount-name>
+        {% endif %}
+        {% if mount.username is defined %}
+        <username>{{ mount.username }}</username>
+        {% endif %}
+        {% if mount.password is defined %}
+        <password>{{ mount.password }}</password>
+        {% endif %}
+        {% if mount.max_listeners is defined %}
+        <max-listeners>{{ mount.max_listeners | int }}</max-listeners>
+        {% endif %}
+        {% if mount.max_listener_duration is defined %}
+        <max-listener-duration>{{ mount.max_listener_duration | int }}</max-listener-duration>
+        {% endif %}
+        {% if mount.dump_file is defined %}
+        <dump-file>{{ mount.dump_file }}</dump-file>
+        {% endif %}
+        {% if mount.intro is defined %}
+        <intro>{{ mount.intro }}</intro>
+        {% endif %}
+        {% if mount.fallback_mount is defined %}
+        <fallback-mount>{{ mount.fallback_mount }}</fallback-mount>
+        {% endif %}
+        {% if mount.fallback_override is defined %}
+        <fallback-override>{{ mount.fallback_override | int }}</fallback-override>
+        {% endif %}
+        {% if mount.fallback_when_full is defined %}
+        <fallback-when-full>{{ mount.fallback_when_full | int }}</fallback-when-full>
+        {% endif %}
+        {% if mount.charset is defined %}
+        <charset>{{ mount.charset }}</charset>
+        {% endif %}
+        {% if mount.public is defined %}
+        <public>{{ mount.public | int }}</public>
+        {% endif %}
+        {% if mount.stream_name is defined %}
+        <stream-name>{{ mount.stream_name }}</stream-name>
+        {% endif %}
+        {% if mount.stream_description is defined %}
+        <stream-description>{{ mount.stream_description }}</stream-description>
+        {% endif %}
+        {% if mount.stream_url is defined %}
+        <stream-url>{{ mount.stream_url }}</stream-url>
+        {% endif %}
+        {% if mount.genre is defined %}
+        <genre>{{ mount.genre }}</genre>
+        {% endif %}
+        {% if mount.bitrate is defined %}
+        <bitrate>{{ mount.genre }}</genre>
+        {% endif %}
+        {% if mount.mimetype is defined %}
+        <type>{{ mount.mimetype }}</type>
+        {% endif %}
+        {% if mount.mime_subtype is defined %}
+        <subtype>{{ mount.mime_subtype }}</subtype>
+        {% endif %}
+        {% if mount.burst_size is defined %}
+        <burst-size>{{ mount.burst_size | int }}</burst-size>
+        {% endif %}
+        {% if mount.mp3_metadata_interval is defined %}
+        <mp3-metadata-interval>{{ mount.mp3_metadata_interval | int }}</mp3-metadata-interval>
+        {% endif %}
+        {% if mount.hidden is defined %}
+        <hidden>{{ mount.hidden | int }}</hidden>
+        {% endif %}
+        {% if mount.authentication is defined %}
+        <authentication type="{{ mount.authentication.type }}">
+            {% for option in mount.authentication.options %}
+            <option name="{{ option.name }}" value="{{ option.value }}" />
+            {% endfor %}
+        </authentication>
+        {% endif %}
+        {% if mount.http_headers is defined %}
+        <http-headers>
+            {% for header in http_headers %}
+                <header name="{{ header.name }}" value="{{ header.value }}" />
+            {% endfor %}
+        </http-headers>
+        {% endif %}
+        {% if mount.on_connect is defined %}
+        <on-connect>{{ mount.on_connect }}</on-connect>
+        {% endif %}
+        {% if mount.on_disconnect is defined %}
+        <on-disconnect>{{ mount.on_disconnect }}</on-disconnect>
+        {% endif %}
+    </mount>
+    {% endfor %}
+    {% endif %}
+
+    <fileserve>{{ icecast_fileserve | int }}</fileserve>
+
+    <paths>
+        {% if icecast_paths_basedir is defined %}
+        <basedir>{{ icecast_paths_basedir }}</basedir>
+        {% endif %}
+        {% if icecast_paths_logdir is defined %}
+        <logdir>/var/log/icecast2</logdir>
+        {% endif %}
+        {% if icecast_paths_webroot is defined %}
+        <webroot>{{ icecast_paths_webroot }}</webroot>
+        {% endif %}
+        {% if icecast_paths_adminroot is defined %}
+        <adminroot>/usr/share/icecast2/admin</adminroot>
+        {% endif %}
+        {% if icecast_paths_pidfile is defined %}
+        <pidfile>{{ icecast_paths_pidfile }}</pidfile>
+        {% endif %}
+        {% if icecast_paths_allow_ip is defined %}
+        <allow-ip>{{ icecast_paths_allow_ip }}</allow-ip>
+        {% endif %}
+        {% if icecast_paths_deny_ip is defined %}
+        <deny-ip>{{ icecast_paths_deny_ip }}</deny-ip>
+        {% endif %}
+        {% if icecast_paths_tls_certificate is defined %}
+        <ssl-certificate>{{ icecast_paths_tls_certificate }}</ssl-certificate>
+        {% endif %}
+        {% if icecast_paths_tls_allowed_ciphers is defined %}
+        <ssl-allowed-ciphers>{{ icecast_paths_tls_allowed_ciphers }}</ssl-allowed-ciphers>
+        {% endif %}
+        {% if icecast_paths_aliases is defined %}
+        {% for alias in icecast_paths_aliases %}
+        <alias
+            source="{{ alias.source }}"
+            destination="{{ alias.destination }}"
+            {% if alias.port is defined %}
+            port="{{ alias.port }}"
+            {% endif %}
+            {% if alias.bind_address is defined %}
+            bind-address="{{ alias.bind_address }}"
+            {% endif %}
+        />
+        {% endfor %}
+        {% endif %}
+    </paths>
+
+    <logging>
+        {% if icecast_logging_accesslog is defined %}
+        <accesslog>{{ icecast_logging_accesslog }}</accesslog>
+        {% endif %}
+        {% if icecast_logging_errorlog is defined %}
+        <errorlog>{{ icecast_logging_errorlog }}</errorlog>
+        {% endif %}
+        {% if icecast_logging_playlistlog is defined %}
+        <playlistlog>{{ icecast_logging_playlistlog }}</playlistlog>
+        {% endif %}
+        {% if icecast_logging_loglevel is defined %}
+        <loglevel>{{ icecast_logging_loglevel | int }}</loglevel>
+        {% endif %}
+        {% if icecast_logging_logsize is defined %}
+        <logsize>{{ icecast_logging_logsize | int }}</logsize>
+        {% endif %}
+        {% if icecast_logging_logarchive is defined %}
+        <logarchive>{{ icecast_logging_logarchive | int }}</logarchive>
+        {% endif %}
+    </logging>
+
+    <security>
+        {% if icecast_security_chroot is defined %}
+        <chroot>{{ icecast_security_chroot | int }}</chroot>
+        {% endif %}
+        {% if
+            icecast_security_changeowner_user is defined
+            or
+            icecast_security_changeowner_group is defined
+        %}
+        <changeowner>
+            {% if icecast_security_changeowner_user is defined %}
+            <user>{{ icecast_security_changeowner_user }}</user>
+            {% endif %}
+            {% if icecast_security_changeowner_group is defined %}
+            <group>{{ icecast_security_changeowner_group }}</group>
+            {% endif %}
+        </changeowner>
+        {% endif %}
+    </security>
+</icecast>

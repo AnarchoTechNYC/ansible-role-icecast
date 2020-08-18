@@ -1,0 +1,22 @@
+---
+dependencies: []
+galaxy_info:
+    role_name: icecast
+    author: AnarchoTechNYC
+    description: Spin up an Icecast streaming server in any number of flexible configurations. 
+    company: Eat The Rich, Inc.
+    license: AGPL-3.0-or-later # SPDX tag from https://spdx.org/licenses/
+    min_ansible_version: 2.9
+    platforms:
+        - name: Raspbian
+          versions:
+              - all
+        - name: Debian
+          versions:
+              - 10
+        - name: Ubuntu
+          version:
+              - 18.04
+              - 20.04
+    galaxy_tags:
+        - icecast

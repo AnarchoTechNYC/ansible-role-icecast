@@ -1,0 +1,20 @@
+---
+- name: Install Icecast.
+  package:
+      name: icecast2
+
+- name: Configure Icecast.
+  template:
+      src: etc/icecast2/icecast.xml.j2
+      dest: /etc/icecast2/icecast.xml
+      owner: icecast2
+      group: icecast
+      mode: '600'
+  notify: Reload Icecast.
+
+- name: Enable Icecast.
+  lineinfile:
+      path: /etc/default/icecast2
+      regexp: "^ENABLE="
+      line: "ENABLE={{ icecast_enabled | lower }}"
+  notify: Restart Icecast.

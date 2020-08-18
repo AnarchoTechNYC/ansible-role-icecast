@@ -1,0 +1,15 @@
+---
+- name: Reload Icecast.
+  service:
+      name: icecast2
+      state: reloaded
+  # Often, reloading Icecast will error rather than succeed. A simple
+  # restart, rather than a reload, will fix it. This is common in the
+  # case where Icecast was just installed, apparently.
+  ignore_errors: true
+
+
+- name: Restart Icecast.
+  service:
+      name: icecast2
+      state: restarted
