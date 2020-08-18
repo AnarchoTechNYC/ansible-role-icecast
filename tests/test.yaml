@@ -1,0 +1,17 @@
+# This Ansible playbook runs test plays to ensure the role works.
+---
+- name: Test role.
+  hosts: localhost
+
+  pre_tasks:
+      - name: Prime Debian APT cache.
+        when: ansible_os_family == "Debian"
+        apt:
+            update_cache: yes
+
+      - name: Install cURL.
+        package:
+            name: curl
+
+  roles:
+    - ansible-role-icecast
