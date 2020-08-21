@@ -1,0 +1,21 @@
+Vagrant.configure("2") do |config|
+
+  config.vagrant.plugins = "vagrant-vbguest"
+
+  boxes = [
+    "ubuntu/bionic64",
+    "centos/7"
+  ]
+  boxes.each do |box|
+    config.vm.define box.gsub '/', '-' do |c|
+      c.vm.box = box
+      c.vm.synced_folder "../", "/vagrant/roles/ansible-role-icecast"
+      c.vm.provision "test", type: "ansible_local", run: "never" do |a|
+        a.playbook = "test.yaml"
+        a.become = true
+      end
+      c.vm.post_up_message = "Run tests with `vagrant provision #{box.gsub '/', '-'} --provision-with test`"
+    end
+  end
+
+end

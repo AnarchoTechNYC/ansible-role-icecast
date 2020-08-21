@@ -1,0 +1,24 @@
+---
+- name: Configure Icecast.
+  template:
+      src: icecast.xml.j2
+      dest: "{{ icecast_conf_file }}"
+      owner: "{{ icecast_user }}"
+      group: icecast
+      mode: '600'
+  notify: Reload Icecast.
+
+- name: Enable Icecast (Debian).
+  when: ansible_facts.os_family  == "Debian"
+  lineinfile:
+      path: /etc/default/icecast2
+      regexp: "^ENABLE="
+      line: "ENABLE={{ icecast_enabled | lower }}"
+  notify: Restart Icecast.
+
+- name: Enable Icecast (RedHat).
+  when: ansible_facts.os_family == "RedHat"
+  service:
+      name: "{{ icecast_package }}"
+      state: started
+      enabled: true

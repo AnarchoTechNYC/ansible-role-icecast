@@ -1,0 +1,11 @@
+---
+icecast_user: icecast2
+icecast_package: icecast2
+icecast_conf_file: /etc/icecast2/icecast.xml
+icecast_paths_basedir: /usr/share/icecast2
+icecast_paths_logdir: /var/log/icecast2
+icecast_paths_webroot: /usr/share/icecast2/web
+icecast_paths_adminroot: /usr/share/icecast2/admin
+#icecast_paths_pidfile: /usr/share/icecast2/icecast.pid
+#icecast_security_changeowner_user: nobody
+#icecast_security_changeowner_group: nogroup

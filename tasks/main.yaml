@@ -1,36 +1,10 @@
 ---
-- name: Install Icecast (Debian).
-  when: ansible_os_family == "Debian"
-  package:
-      name: icecast2
+- name: Load OS-specific variables.
+  include_vars:
+      file: "{{ ansible_facts.os_family }}.yaml"
 
-- name: Install Icecast for RedHat.
-  when: ansible_os_family == "RedHat"
-  block:
-    - name: Add EPEL repository.
-      when: ansible_os_family == "RedHat"
-      yum_repository:
-          name: epel
-          description: EPEL YUM repo
-          baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
-
-    - name: Install Icecast (RedHat).
-      when: ansible_os_family == "RedHat"
-      package:
-          name: icecast
+- name: Install Icecast.
+  import_tasks: "install.yaml"
 
 - name: Configure Icecast.
-  template:
-      src: etc/icecast2/icecast.xml.j2
-      dest: /etc/icecast2/icecast.xml
-      owner: icecast2
-      group: icecast
-      mode: '600'
-  notify: Reload Icecast.
-
-- name: Enable Icecast.
-  lineinfile:
-      path: /etc/default/icecast2
-      regexp: "^ENABLE="
-      line: "ENABLE={{ icecast_enabled | lower }}"
-  notify: Restart Icecast.
+  import_tasks: "configure.yaml"

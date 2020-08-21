@@ -15,8 +15,14 @@ galaxy_info:
           versions:
               - 10
         - name: Ubuntu
-          version:
+          versions:
               - 18.04
               - 20.04
+        - name: CentOS
+          versions:
+              - 7
+        - name: Fedora
+          versions:
+              - 32
     galaxy_tags:
         - icecast

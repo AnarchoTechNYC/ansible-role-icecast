@@ -32,13 +32,6 @@ icecast_location: Earth
 icecast_admin_email: icemaster@localhost
 icecast_fileserve: true
 
-# These variables are used as values for the Icecast `<paths>` config
-# element. (They are not installation paths.)
-icecast_paths_basedir: /usr/share/icecast2
-icecast_paths_logdir: /var/log/icecast2
-icecast_paths_webroot: /usr/share/icecast2/web
-icecast_paths_adminroot: /usr/share/icecast2/admin
-#icecast_paths_pidfile: /usr/share/icecast2/icecast.pid
 #icecast_paths_tls_certificate: /usr/share/icecast2/icecast.pem
 #icecast_paths_ssl_certificate: "{{ icecast_paths_tls_certificate }}"
 icecast_paths_aliases:
@@ -72,8 +65,6 @@ icecast_logging_logsize: 10000
 #icecast_logging_logarchive: true
 
 icecast_security_chroot: false
-#icecast_security_changeowner_user: nobody
-#icecast_security_changeowner_group: nogroup
 
 # By default, Icecast's YP (Yellow Pages) directroy listings are not
 # enabled. In your role, provide the `icecast_directory` variable with

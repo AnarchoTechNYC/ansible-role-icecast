@@ -1,11 +1,12 @@
 # This Ansible playbook runs test plays to ensure the role works.
 ---
 - name: Test role.
-  hosts: localhost
+  hosts: all
 
   pre_tasks:
+
       - name: Prime Debian APT cache.
-        when: ansible_os_family == "Debian"
+        when: ansible_facts.os_family == "Debian"
         apt:
             update_cache: yes
 

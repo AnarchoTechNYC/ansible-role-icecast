@@ -1,0 +1,11 @@
+---
+icecast_user: icecast
+icecast_package: icecast
+icecast_conf_file: /etc/icecast.xml
+icecast_paths_basedir: /usr/share/icecast
+icecast_paths_logdir: /var/log/icecast
+icecast_paths_webroot: /usr/share/icecast/web
+icecast_paths_adminroot: /usr/share/icecast/admin
+icecast_paths_pidfile: /var/run/icecast/icecast.pid
+icecast_security_changeowner_user: "{{ icecast_user }}"
+icecast_security_changeowner_group: "{{ icecast_user }}"
