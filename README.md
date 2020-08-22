@@ -39,11 +39,11 @@ Use [Molecule](https://molecule.readthedocs.io/en/latest/) to run the tests. (Yo
 
 ```sh
 # Molecule is written in Python, so you'll also need Python.
-python -m venv venv      # Create your virtual environment.
-source venv/bin/activate # Activate it.
-pip install molecule     # Install Molecule.
+python -m venv venv                      # Create your virtual environment.
+source venv/bin/activate                 # Activate it.
+pip install molecule ansible-lint docker # Install testing tools.
 
-# Then, you can run the tests (if you also have Docker installed):
+# Then, you can run the tests:
 molecule test
 
 # When you're done, deactivate your virtual environment.
