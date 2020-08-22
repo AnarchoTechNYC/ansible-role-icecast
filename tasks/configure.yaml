@@ -14,6 +14,7 @@
       path: /etc/default/icecast2
       regexp: "^ENABLE="
       line: "ENABLE={{ icecast_enabled | lower }}"
+      mode: '0600'
   notify: Restart Icecast.
 
 - name: Enable Icecast (RedHat).

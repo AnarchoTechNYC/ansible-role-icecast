@@ -5,64 +5,33 @@ os: linux
 language: shell
 
 env:
-  - docker_repo: resin/rpi-raspbian
-  - docker_repo: geerlingguy/docker-debian10-ansible
-  - docker_repo: geerlingguy/docker-ubuntu2004-ansible
-  - docker_repo: geerlingguy/docker-ubuntu1804-ansible
-  - docker_repo: geerlingguy/docker-centos8-ansible
-  - docker_repo: geerlingguy/docker-fedora32-ansible
+  - docker_repo=geerlingguy/docker-debian10-ansible
+  - docker_repo=geerlingguy/docker-ubuntu2004-ansible
+  - docker_repo=geerlingguy/docker-ubuntu1804-ansible
+  - docker_repo=geerlingguy/docker-centos8-ansible docker_command=/usr/sbin/init
+  - docker_repo=geerlingguy/docker-centos7-ansible docker_command=/usr/sbin/init
+  - docker_repo=geerlingguy/docker-fedora32-ansible docker_command=/usr/sbin/init
+  - docker_repo=resin/rpi-raspbian
 
 jobs:
   # TODO: Fix these failures?
   allow_failures:
+    - env: docker_repo=geerlingguy/docker-centos8-ansible docker_command=/usr/sbin/init
     # TODO: Fixing the Raspbian build is going to require QEMU and
     #       binfmt_misc support. See:
     #       https://www.balena.io/blog/building-arm-containers-on-any-x86-machine-even-dockerhub/
     #       In the mean time, allow this to fail.
     - env: docker_repo=resin/rpi-raspbian
-    - env: docker_repo=geerlingguy/docker-centos8-ansible
-    - env: docker_repo=geerlingguy/docker-fedora32-ansible
+
+before_install:
+    # Upgrade to newest Docker Engine.
+    - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    - sudo apt-get update
+    - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
 install:
-  - docker image pull ${docker_repo}
-  - container_id=$(mktemp)
-  - >
-    docker container run --detach --privileged
-    --volume /sys/fs/cgroup:/sys/fs/cgroup:ro
-    --volume ${PWD}:/etc/ansible/roles/ansible-role-icecast:ro
-    ${docker_repo}:latest > ${container_id}
+  - pip install --user molecule yamllint ansible-lint docker
 
 script:
-  # Check Ansible role/playbook syntax.
-  - >
-    docker container exec --tty "$(cat ${container_id})" env TERM=xterm
-    ansible-playbook --syntax-check /etc/ansible/roles/ansible-role-icecast/tests/test.yaml
-
-  # Ensure the role/playbook runs without errors or failures.
-  - >
-    docker container exec --tty "$(cat ${container_id})" env TERM=xterm
-    ansible-playbook /etc/ansible/roles/ansible-role-icecast/tests/test.yaml
-
-  # Run the role/playbook again to test idempotence.
-  - idempotence=$(mktemp)
-  - >
-    docker container exec "$(cat ${container_id})"
-    ansible-playbook /etc/ansible/roles/ansible-role-icecast/tests/test.yaml
-    | tee -a ${idempotence}
-  - >
-    tail ${idempotence}
-    | grep -q 'changed=0.*failed=0'
-    && (echo 'Idempotence test: pass' && exit 0)
-    || (echo 'Idempotence test: fail' && exit 1)
-
-  # Ensure Icecast service is active and accessible.
-  - >
-    docker container exec --tty "$(cat ${container_id})" env TERM=xterm
-    curl --silent http://localhost:8000/
-
-# After build failures, these commands provide additional diagnostics.
-#after_failure:
-  #- echo "something_interesting"
-
-after_script:
-  - docker container rm -f "$(cat ${container_id})"
+  - molecule test

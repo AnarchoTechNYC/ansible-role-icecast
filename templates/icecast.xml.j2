@@ -222,13 +222,13 @@ See: https://icecast.org/docs/icecast-2.4.1/config-file.html
         <basedir>{{ icecast_paths_basedir }}</basedir>
         {% endif %}
         {% if icecast_paths_logdir is defined %}
-        <logdir>/var/log/icecast2</logdir>
+        <logdir>{{ icecast_paths_logdir }}</logdir>
         {% endif %}
         {% if icecast_paths_webroot is defined %}
         <webroot>{{ icecast_paths_webroot }}</webroot>
         {% endif %}
         {% if icecast_paths_adminroot is defined %}
-        <adminroot>/usr/share/icecast2/admin</adminroot>
+        <adminroot>{{ icecast_paths_adminroot }}</adminroot>
         {% endif %}
         {% if icecast_paths_pidfile is defined %}
         <pidfile>{{ icecast_paths_pidfile }}</pidfile>

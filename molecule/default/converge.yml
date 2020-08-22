@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include ansible-role-icecast"
+      include_role:
+        name: "ansible-role-icecast"

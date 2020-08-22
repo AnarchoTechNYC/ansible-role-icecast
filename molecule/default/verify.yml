@@ -1,0 +1,10 @@
+---
+- name: Verify
+  hosts: all
+  tasks:
+  - name: Icecast server is operational.
+    uri:
+      url: http://localhost:8000
+      return_content: true
+    register: this
+    failed_when: "'Icecast' not in this.content"

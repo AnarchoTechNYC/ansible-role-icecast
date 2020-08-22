@@ -32,3 +32,20 @@ Some examples may prove helpful:
     ```
 
 See the comments in the [`defaults/main.yaml`](defaults/main.yaml) file for additional details.
+
+# Testing
+
+Use [Molecule](https://molecule.readthedocs.io/en/latest/) to run the tests. (You'll also need to install [Docker](https://docker.com/), as tests are run in Docker containers.) Here's how to install Molecule into a virtual environment.
+
+```sh
+# Molecule is written in Python, so you'll also need Python.
+python -m venv venv      # Create your virtual environment.
+source venv/bin/activate # Activate it.
+pip install molecule     # Install Molecule.
+
+# Then, you can run the tests (if you also have Docker installed):
+molecule test
+
+# When you're done, deactivate your virtual environment.
+deactivate
+```

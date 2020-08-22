@@ -5,8 +5,6 @@ Documentation=https://icecast.org/docs/
 
 [Service]
 Type=simple
-User={{ icecast_user }}
-Group=icecast
 ExecStart=/bin/icecast -c {{ icecast_conf_file }}
 ExecReload=/bin/kill -HUP $MAINPID
 

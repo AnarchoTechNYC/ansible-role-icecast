@@ -1,4 +1,5 @@
 # This Ansible playbook runs test plays to ensure the role works.
+# DEPRECATED: We now use `molecule` to run tests.
 ---
 - name: Test role.
   hosts: all
