@@ -2,6 +2,7 @@
 version: ~> 1.0
 
 os: linux
+dist: bionic
 language: shell
 
 env:
@@ -31,7 +32,8 @@ before_install:
     - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
 install:
-  - pip install --user molecule yamllint ansible-lint docker
+  - sudo apt-get install python3-pip python3-setuptools python3-wheel
+  - pip3 install --user molecule yamllint ansible-lint docker
 
 script:
   - molecule test
